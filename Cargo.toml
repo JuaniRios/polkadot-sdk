@@ -999,7 +999,7 @@ paste = { version = "1.0.15", default-features = false }
 pbkdf2 = { version = "0.12.2", default-features = false }
 penpal-emulated-chain = { path = "cumulus/parachains/integration-tests/emulated/chains/parachains/testing/penpal" }
 penpal-runtime = { path = "cumulus/parachains/runtimes/testing/penpal" }
-pallet-freezer = { path = "cumulus/parachains/runtimes/testing/penpal/pallet-freezer" }
+pallet-freezer = { path = "cumulus/parachains/runtimes/testing/penpal/pallet-freezer", optional = true }
 people-rococo-emulated-chain = { path = "cumulus/parachains/integration-tests/emulated/chains/parachains/people/people-rococo" }
 people-rococo-runtime = { path = "cumulus/parachains/runtimes/people/people-rococo" }
 people-westend-emulated-chain = { path = "cumulus/parachains/integration-tests/emulated/chains/parachains/people/people-westend" }
