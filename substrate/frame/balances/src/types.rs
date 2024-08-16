@@ -20,8 +20,9 @@
 use crate::{Config, CreditOf, Event, Pallet};
 use codec::{Decode, Encode, MaxEncodedLen};
 use core::ops::BitOr;
-use frame_support::traits::{Imbalance, LockIdentifier, OnUnbalanced, WithdrawReasons};
+use frame_support::traits::{ConstU32, Imbalance, LockIdentifier, OnUnbalanced, VariantCount, VariantCountOf, WithdrawReasons};
 use scale_info::TypeInfo;
+use frame_support::BoundedVec;
 use sp_runtime::{RuntimeDebug, Saturating};
 
 /// Simplified reasons for withdrawing balance.
@@ -152,3 +153,6 @@ pub enum AdjustmentDirection {
 	/// Decrease the amount.
 	Decrease,
 }
+
+
+pub type BalanceOf<T, I> = <T as Config<I>>::Balance;

@@ -1,0 +1,42 @@
+[package]
+name = "fungible-behavior"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+homepage.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+codec = { workspace = true }
+scale-info = { features = ["derive"], workspace = true }
+hex-literal = { workspace = true, default-features = true }
+
+# Substrate
+sp-core = { workspace = true }
+frame-support = { workspace = true }
+pallet-assets = { workspace = true }
+pallet-asset-conversion = { workspace = true }
+pallet-balances = { workspace = true }
+pallet-message-queue = { workspace = true, default-features = true }
+sp-runtime = { workspace = true }
+
+# Polkadot
+xcm = { workspace = true }
+pallet-xcm = { workspace = true }
+xcm-executor = { workspace = true }
+
+# Bridges
+pallet-bridge-messages = { workspace = true }
+
+# Cumulus
+cumulus-pallet-xcmp-queue = { workspace = true }
+emulated-integration-tests-common = { workspace = true }
+parachains-common = { workspace = true, default-features = true }
+rococo-system-emulated-network = { workspace = true }
+rococo-westend-system-emulated-network = { workspace = true }
+penpal-emulated-chain = { workspace = true }
+testnet-parachains-constants = { features = ["rococo"], workspace = true, default-features = true }

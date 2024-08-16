@@ -25,7 +25,7 @@ use sp_arithmetic::{
 	traits::{CheckedAdd, CheckedSub},
 	ArithmeticError,
 };
-use sp_runtime::{DispatchResult, TokenError};
+use sp_runtime::{DispatchError, DispatchResult, TokenError};
 
 use crate::{ensure, traits::tokens::Fortitude};
 
@@ -108,11 +108,11 @@ pub trait Mutate<AccountId>: Inspect<AccountId> {
 
 	/// Decrease the amount which is being frozen for a particular freeze, failing in the case of
 	/// underflow.
-	fn decrease_frozen(id: &Self::Id, who: &AccountId, amount: Self::Balance) -> DispatchResult {
+	fn decrease_frozen(id: &Self::Id, who: &AccountId, amount: Self::Balance) -> Result<Self::Balance, DispatchError> {
 		let a = Self::balance_frozen(id, who)
 			.checked_sub(&amount)
 			.ok_or(ArithmeticError::Underflow)?;
-		Self::set_freeze(id, who, a)
+		Self::set_freeze(id, who, a).map(|_| a)
 	}
 
 	/// Increase the amount which is being frozen for a particular freeze, failing in the case that

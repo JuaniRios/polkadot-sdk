@@ -199,6 +199,7 @@ pub mod pallet {
 		traits::{fungible::Credit, tokens::Precision, VariantCount, VariantCountOf},
 	};
 	use frame_system::pallet_prelude::*;
+	use crate::types::VariantVec;
 
 	pub type CreditOf<T, I> = Credit<<T as frame_system::Config>::AccountId, Pallet<T, I>>;
 
@@ -231,6 +232,7 @@ pub mod pallet {
 
 			type MaxLocks = ConstU32<100>;
 			type MaxReserves = ConstU32<100>;
+			type MaxSlashEvents = ConstU32<100>;
 			type MaxFreezes = VariantCountOf<Self::RuntimeFreezeReason>;
 
 			type WeightInfo = ();
@@ -250,7 +252,7 @@ pub mod pallet {
 
 		/// The overarching freeze reason.
 		#[pallet::no_default_bounds]
-		type RuntimeFreezeReason: VariantCount;
+		type RuntimeFreezeReason: VariantCount + VariantVec;
 
 		/// Weight information for extrinsics in this pallet.
 		type WeightInfo: WeightInfo;
@@ -294,7 +296,7 @@ pub mod pallet {
 		type ReserveIdentifier: Parameter + Member + MaxEncodedLen + Ord + Copy;
 
 		/// The ID type for freezes.
-		type FreezeIdentifier: Parameter + Member + MaxEncodedLen + Copy;
+		type FreezeIdentifier: Parameter + Member + MaxEncodedLen + Copy + VariantVec;
 
 		/// The maximum number of locks that should exist on an account.
 		/// Not strictly enforced, but used for weight estimation.
@@ -312,6 +314,10 @@ pub mod pallet {
 		/// The maximum number of individual freeze locks that can exist on an account at any time.
 		#[pallet::constant]
 		type MaxFreezes: Get<u32>;
+
+		/// The maximum number of individual slash events not yet fully addressed
+		#[pallet::constant]
+		type MaxSlashEvents: Get<u32>;
 	}
 
 	/// The in-code storage version.
@@ -490,6 +496,16 @@ pub mod pallet {
 		Blake2_128Concat,
 		T::AccountId,
 		BoundedVec<IdAmount<T::FreezeIdentifier, T::Balance>, T::MaxFreezes>,
+		ValueQuery,
+	>;
+
+	/// Store of slashes made on an account which have not yet been deducted from a freeze id.
+	#[pallet::storage]
+	pub type SlashEvents<T: Config<I>, I: 'static = ()> = StorageMap<
+		_,
+		Blake2_128Concat,
+		T::AccountId,
+		BoundedVec<(T::Balance, BoundedVec<T::FreezeIdentifier, VariantCountOf<T::FreezeIdentifier>>), T::MaxSlashEvents>,
 		ValueQuery,
 	>;
 

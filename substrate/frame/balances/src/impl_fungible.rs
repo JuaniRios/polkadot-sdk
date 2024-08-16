@@ -25,6 +25,8 @@ use frame_support::traits::{
 	},
 	AccountTouch,
 };
+use frame_support::traits::fungible::InspectFreeze;
+use crate::types::{BalanceOf, VariantVec};
 
 impl<T: Config<I>, I: 'static> fungible::Inspect<T::AccountId> for Pallet<T, I> {
 	type Balance = T::Balance;
@@ -321,6 +323,17 @@ impl<T: Config<I>, I: 'static> fungible::MutateFreeze<T::AccountId> for Pallet<T
 		Self::update_freezes(who, locks.as_bounded_slice())
 	}
 
+	/// Will return the actual amount that was set, accounting for possible slash events
+	fn decrease_frozen(id: &Self::Id, who: &T::AccountId, amount: Self::Balance) -> Result<Self::Balance, DispatchError> {
+		let slash_reduction = Self::retrieve_slash(id, who);
+		let a = <Self as fungible::InspectFreeze<T::AccountId>>::balance_frozen(id, who)
+			.checked_sub(&amount)
+			.ok_or(ArithmeticError::Underflow)?
+			.saturating_sub(slash_reduction);
+
+		Self::set_freeze(id, who, a).map(|_| a)
+	}
+
 	fn extend_freeze(id: &Self::Id, who: &T::AccountId, amount: Self::Balance) -> DispatchResult {
 		if amount.is_zero() {
 			return Ok(())
@@ -361,7 +374,11 @@ impl<T: Config<I>, I: 'static> fungible::Balanced<T::AccountId> for Pallet<T, I>
 	}
 }
 
-impl<T: Config<I>, I: 'static> fungible::BalancedHold<T::AccountId> for Pallet<T, I> {}
+impl<T: Config<I>, I: 'static> fungible::BalancedHold<T::AccountId> for Pallet<T, I> {
+	fn done_slash(_reason: &Self::Reason, _who: &T::AccountId, _amount: Self::Balance) {
+		Self::store_slash_event(_who, _amount);
+	}
+}
 
 impl<T: Config<I>, I: 'static> AccountTouch<(), T::AccountId> for Pallet<T, I> {
 	type Balance = T::Balance;
@@ -375,3 +392,35 @@ impl<T: Config<I>, I: 'static> AccountTouch<(), T::AccountId> for Pallet<T, I> {
 		Ok(())
 	}
 }
+
+impl<T: Config<I>, I: 'static> Pallet<T, I> {
+	/// Can be used to store a slash event and later to account for it later in a freeze reduction.
+	/// Normally whenever an account is slashed, all freezes should reflect this reduction.
+	fn store_slash_event(_who: &T::AccountId, _amount: BalanceOf<T, I>) {
+		let variants = <<T as Config<I>>::FreezeIdentifier as VariantVec>::all_variants();
+
+		SlashEvents::<T, I>::mutate(_who, |events| {
+			// TODO: deal with the unwrap
+			events.try_push((_amount, variants)).unwrap();
+		});
+	}
+
+	/// After a slash on an account, freezes need to be updated. This function should be called before reducing a freeze
+	/// to ensure that the desired reduced freeze is updated correctly with the new reduced amount minus the slashed amount.
+	/// retrieve slash will mark this id as retrieved after the first call, such that subsequent calls will not tell
+	/// the caller to reduce the freeze again.
+	fn retrieve_slash(_id: &T::FreezeIdentifier, _who: &T::AccountId) -> T::Balance {
+		SlashEvents::<T, I>::mutate(_who, |events| {
+			let mut total_slashed = T::Balance::zero();
+			for event in events.iter_mut() {
+				if let Some(index) = event.1.iter().position(|x| x == _id) {
+					event.1.remove(index);
+					total_slashed = total_slashed.saturating_add(event.0);
+				}
+			}
+			events.retain(|x| !x.1.is_empty());
+			total_slashed
+		})
+	}
+}
+

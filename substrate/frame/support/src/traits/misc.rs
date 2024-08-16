@@ -32,6 +32,7 @@ pub use sp_runtime::traits::{
 	ConstU64, ConstU8, Get, GetDefault, TryCollect, TypedGet,
 };
 use sp_runtime::{traits::Block as BlockT, DispatchError};
+use crate::BoundedVec;
 
 #[doc(hidden)]
 pub const DEFENSIVE_OP_PUBLIC_ERROR: &str = "a defensive failure has been triggered; please report the block number at https://github.com/paritytech/substrate/issues";
@@ -51,6 +52,17 @@ impl VariantCount for () {
 impl VariantCount for u8 {
 	const VARIANT_COUNT: u32 = 256;
 }
+
+pub trait VariantVec: VariantCount {
+	fn all_variants() -> BoundedVec<Self, VariantCountOf<Self>> where Self: Sized;
+}
+
+impl VariantVec for () {
+	fn all_variants() -> BoundedVec<Self, VariantCountOf<Self>> {
+		BoundedVec::new()
+	}
+}
+
 
 /// Adapter for `Get<u32>` to access `VARIANT_COUNT` from `trait pub trait VariantCount {`.
 pub struct VariantCountOf<T: VariantCount>(core::marker::PhantomData<T>);

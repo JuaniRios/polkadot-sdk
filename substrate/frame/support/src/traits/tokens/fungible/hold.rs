@@ -451,4 +451,6 @@ pub trait Balanced<AccountId>: super::Balanced<AccountId> + Unbalanced<AccountId
 	}
 
 	fn done_slash(_reason: &Self::Reason, _who: &AccountId, _amount: Self::Balance) {}
+
+
 }
