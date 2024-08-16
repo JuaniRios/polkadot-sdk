@@ -296,7 +296,7 @@ pub mod pallet {
 		type ReserveIdentifier: Parameter + Member + MaxEncodedLen + Ord + Copy;
 
 		/// The ID type for freezes.
-		type FreezeIdentifier: Parameter + Member + MaxEncodedLen + Copy + VariantVec;
+		type FreezeIdentifier: Parameter + Member + MaxEncodedLen + Copy;
 
 		/// The maximum number of locks that should exist on an account.
 		/// Not strictly enforced, but used for weight estimation.
@@ -505,7 +505,7 @@ pub mod pallet {
 		_,
 		Blake2_128Concat,
 		T::AccountId,
-		BoundedVec<(T::Balance, BoundedVec<T::FreezeIdentifier, VariantCountOf<T::FreezeIdentifier>>), T::MaxSlashEvents>,
+		BoundedVec<(T::Balance, BoundedVec<T::RuntimeFreezeReason, VariantCountOf<T::FreezeIdentifier>>), T::MaxSlashEvents>,
 		ValueQuery,
 	>;
 

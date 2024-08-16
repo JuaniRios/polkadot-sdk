@@ -398,7 +398,7 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
 	/// Can be used to store a slash event and later to account for it later in a freeze reduction.
 	/// Normally whenever an account is slashed, all freezes should reflect this reduction.
 	fn store_slash_event(_who: &T::AccountId, _amount: BalanceOf<T, I>) {
-		let variants = <<T as Config<I>>::FreezeIdentifier as VariantVec>::all_variants();
+		let variants = <<T as Config<I>>::RuntimeFreezeReason as VariantVec>::all_variants();
 
 		SlashEvents::<T, I>::mutate(_who, |events| {
 			// TODO: deal with the unwrap
@@ -410,7 +410,7 @@ impl<T: Config<I>, I: 'static> Pallet<T, I> {
 	/// to ensure that the desired reduced freeze is updated correctly with the new reduced amount minus the slashed amount.
 	/// retrieve slash will mark this id as retrieved after the first call, such that subsequent calls will not tell
 	/// the caller to reduce the freeze again.
-	fn retrieve_slash(_id: &T::FreezeIdentifier, _who: &T::AccountId) -> T::Balance {
+	fn retrieve_slash(_id: &T::RuntimeFreezeReason, _who: &T::AccountId) -> T::Balance {
 		SlashEvents::<T, I>::mutate(_who, |events| {
 			let mut total_slashed = T::Balance::zero();
 			for event in events.iter_mut() {

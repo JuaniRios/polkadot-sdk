@@ -63,9 +63,10 @@ use parachains_common::{
 	message_queue::{NarrowOriginToSibling, ParaIdToSibling},
 };
 use smallvec::smallvec;
+use frame_support::traits::VariantVec;
 use sp_api::impl_runtime_apis;
 pub use sp_consensus_aura::sr25519::AuthorityId as AuraId;
-use sp_core::{crypto::KeyTypeId, OpaqueMetadata};
+use sp_core::{bounded_vec, crypto::KeyTypeId, OpaqueMetadata};
 use sp_runtime::{
 	create_runtime_str, generic, impl_opaque_keys,
 	traits::{AccountIdLookup, BlakeTwo256, Block as BlockT, Dispatchable},
@@ -414,7 +415,7 @@ impl pallet_balances::Config for Runtime {
 	type RuntimeFreezeReason = RuntimeFreezeReason;
 	type FreezeIdentifier = ();
 	type MaxFreezes = VariantCountOf<RuntimeFreezeReason>;
-	type MaxSlashEvents =ConstU32<100>;
+	type MaxSlashEvents = ConstU32<100>;
 }
 
 parameter_types! {
@@ -691,6 +692,15 @@ construct_runtime!(
 		Sudo: pallet_sudo = 255,
 	}
 );
+
+impl VariantVec for RuntimeFreezeReason {
+	fn all_variants() -> BoundedVec<Self, VariantCountOf<Self>>
+	where
+		Self: Sized
+	{
+		bounded_vec!(RuntimeFreezeReason::)
+	}
+}
 
 #[cfg(feature = "runtime-benchmarks")]
 mod benches {

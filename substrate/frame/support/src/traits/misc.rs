@@ -25,6 +25,7 @@ use scale_info::{build::Fields, meta_type, Path, Type, TypeInfo, TypeParameter};
 use sp_arithmetic::traits::{CheckedAdd, CheckedMul, CheckedSub, One, Saturating};
 use sp_core::bounded::bounded_vec::TruncateFrom;
 
+use crate::BoundedVec;
 use core::cmp::Ordering;
 #[doc(hidden)]
 pub use sp_runtime::traits::{
@@ -32,7 +33,6 @@ pub use sp_runtime::traits::{
 	ConstU64, ConstU8, Get, GetDefault, TryCollect, TypedGet,
 };
 use sp_runtime::{traits::Block as BlockT, DispatchError};
-use crate::BoundedVec;
 
 #[doc(hidden)]
 pub const DEFENSIVE_OP_PUBLIC_ERROR: &str = "a defensive failure has been triggered; please report the block number at https://github.com/paritytech/substrate/issues";
@@ -54,15 +54,22 @@ impl VariantCount for u8 {
 }
 
 pub trait VariantVec: VariantCount {
-	fn all_variants() -> BoundedVec<Self, VariantCountOf<Self>> where Self: Sized;
+	fn all_variants() -> BoundedVec<Self, VariantCountOf<Self>>
+	where
+		Self: Sized;
 }
 
-impl VariantVec for () {
+// impl VariantVec for () {
+// 	fn all_variants() -> BoundedVec<Self, VariantCountOf<Self>> {
+// 		BoundedVec::new()
+// 	}
+// }
+
+impl<T: VariantCount> VariantVec for T {
 	fn all_variants() -> BoundedVec<Self, VariantCountOf<Self>> {
 		BoundedVec::new()
 	}
 }
-
 
 /// Adapter for `Get<u32>` to access `VARIANT_COUNT` from `trait pub trait VariantCount {`.
 pub struct VariantCountOf<T: VariantCount>(core::marker::PhantomData<T>);
