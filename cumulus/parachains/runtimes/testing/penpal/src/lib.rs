@@ -44,8 +44,9 @@ use frame_support::{
 	genesis_builder_helper::{build_state, get_preset},
 	pallet_prelude::Weight,
 	parameter_types,
+	BoundedVec,
 	traits::{
-		AsEnsureOriginWithArg, ConstBool, ConstU32, ConstU64, ConstU8, Everything, TransformOrigin,
+		AsEnsureOriginWithArg, ConstBool, ConstU32, ConstU64, ConstU8, Everything, TransformOrigin, VariantCountOf,
 	},
 	weights::{
 		constants::WEIGHT_REF_TIME_PER_SECOND, ConstantMultiplier, FeePolynomial, WeightToFee as _,
@@ -412,7 +413,8 @@ impl pallet_balances::Config for Runtime {
 	type RuntimeHoldReason = RuntimeHoldReason;
 	type RuntimeFreezeReason = RuntimeFreezeReason;
 	type FreezeIdentifier = ();
-	type MaxFreezes = ConstU32<0>;
+	type MaxFreezes = VariantCountOf<RuntimeFreezeReason>;
+	type MaxSlashEvents =ConstU32<100>;
 }
 
 parameter_types! {

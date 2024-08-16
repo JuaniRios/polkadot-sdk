@@ -199,7 +199,7 @@ pub mod pallet {
 		traits::{fungible::Credit, tokens::Precision, VariantCount, VariantCountOf},
 	};
 	use frame_system::pallet_prelude::*;
-	use crate::types::VariantVec;
+	use frame_support::traits::VariantVec;
 
 	pub type CreditOf<T, I> = Credit<<T as frame_system::Config>::AccountId, Pallet<T, I>>;
 

@@ -90,6 +90,7 @@ use assets_common::{
 	foreign_creators::ForeignCreators,
 	matching::{FromNetwork, FromSiblingParachain},
 };
+use frame_support::traits::VariantCountOf;
 use polkadot_runtime_common::{BlockHashCount, SlowAdjustingFeeUpdate};
 use xcm::{
 	latest::prelude::AssetId,
@@ -212,7 +213,8 @@ impl pallet_balances::Config for Runtime {
 	type RuntimeHoldReason = RuntimeHoldReason;
 	type RuntimeFreezeReason = RuntimeFreezeReason;
 	type FreezeIdentifier = ();
-	type MaxFreezes = ConstU32<0>;
+	type MaxFreezes = VariantCountOf<RuntimeFreezeReason>;
+	type MaxSlashEvents = ConstU32<100>;
 }
 
 parameter_types! {

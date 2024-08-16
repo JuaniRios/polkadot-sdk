@@ -62,7 +62,7 @@ pub use misc::{
 	ExecuteBlock, ExtrinsicCall, Get, GetBacking, GetDefault, HandleLifetime, IsInherent,
 	IsSubType, IsType, Len, OffchainWorker, OnKilledAccount, OnNewAccount, PrivilegeCmp,
 	SameOrOther, Time, TryCollect, TryDrop, TypedGet, UnixTime, VariantCount, VariantCountOf,
-	WrapperKeepOpaque, WrapperOpaque,
+	VariantVec, WrapperKeepOpaque, WrapperOpaque,
 };
 #[allow(deprecated)]
 pub use misc::{PreimageProvider, PreimageRecipient};

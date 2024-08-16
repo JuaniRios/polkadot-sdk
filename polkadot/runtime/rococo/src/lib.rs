@@ -31,7 +31,7 @@ use codec::{Decode, Encode, MaxEncodedLen};
 use core::cmp::Ordering;
 use frame_support::{
 	dynamic_params::{dynamic_pallet_params, dynamic_params},
-	traits::FromContains,
+	traits::{FromContains, VariantCountOf}, BoundedVec
 };
 use pallet_nis::WithMaximumOf;
 use polkadot_primitives::{
@@ -397,7 +397,8 @@ impl pallet_balances::Config for Runtime {
 	type FreezeIdentifier = ();
 	type RuntimeHoldReason = RuntimeHoldReason;
 	type RuntimeFreezeReason = RuntimeFreezeReason;
-	type MaxFreezes = ConstU32<1>;
+	type MaxFreezes = VariantCountOf<RuntimeFreezeReason>;
+	type MaxSlashEvents = ConstU32<100>;
 }
 
 parameter_types! {
@@ -1231,7 +1232,8 @@ impl pallet_balances::Config<NisCounterpartInstance> for Runtime {
 	type RuntimeHoldReason = RuntimeHoldReason;
 	type RuntimeFreezeReason = RuntimeFreezeReason;
 	type FreezeIdentifier = ();
-	type MaxFreezes = ConstU32<1>;
+	type MaxFreezes = VariantCountOf<RuntimeFreezeReason>;
+	type MaxSlashEvents = ConstU32<100>;
 }
 
 parameter_types! {

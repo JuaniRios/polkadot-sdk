@@ -70,7 +70,15 @@ pub fn expand_outer_freeze_reason(pallet_decls: &[Pallet], scrate: &TokenStream)
 			const VARIANT_COUNT: u32 = 0 #( + #freeze_reason_variants_count )*;
 		}
 
-		impl #scrate::traits::VariantVec
+		impl #scrate::traits::VariantVec for RuntimeFreezeReason {
+			fn all_variants() -> BoundedVec<Self, VariantCountOf<Self>> {
+				let mut variants = BoundedVec::new();
+				#(
+					variants.try_push(#freeze_reason_variants).unwrap();
+				)*
+				variants
+			}
+		}
 
 		#( #conversion_fns )*
 	}

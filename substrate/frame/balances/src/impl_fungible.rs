@@ -24,9 +24,10 @@ use frame_support::traits::{
 		Provenance::{self, Minted},
 	},
 	AccountTouch,
+	VariantVec
 };
 use frame_support::traits::fungible::InspectFreeze;
-use crate::types::{BalanceOf, VariantVec};
+use crate::types::{BalanceOf};
 
 impl<T: Config<I>, I: 'static> fungible::Inspect<T::AccountId> for Pallet<T, I> {
 	type Balance = T::Balance;
